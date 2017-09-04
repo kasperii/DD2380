@@ -8,6 +8,7 @@ public class Matriximo {
   Matriximo(int first, int second){
     n = first;
     m = second;
+    data = new float[n][m];
   }
 
   void setValue(int i,int j,float value){
