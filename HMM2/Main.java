@@ -41,7 +41,7 @@ public class Main {
 
 
 
-    for(int t=1;t<N;t++){ //2.19-2.20
+    for(int t=1;t<T;t++){ //2.19-2.20
     	//for each timeframe
     	for(int i=0;i<N;i++){
         //and for each state
