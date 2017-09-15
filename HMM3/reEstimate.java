@@ -1,4 +1,4 @@
-public static void reEstimatePi (int[] PI, int[][] gamma){
+public static void reEstimatePi (int[][] gamma){
   // re-estimate π
   for (i = 0, i < N, i++){
     PI[i] = gamma[0][i];
