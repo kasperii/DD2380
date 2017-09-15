@@ -31,8 +31,22 @@ public class Main {
     }
     //aPass alpha = new aPass(A,B,PI,O);
     //System.out.println(alpha.calcAlpha());
-    bPass beta = new bPass(A,B,PI,O);
-    System.out.println(beta.calcBeta());
+    //bPass beta = new bPass(A,B,PI,O);
+    //System.out.println(beta.calcBeta());
 
+
+//1. Initialize λ = (A, B, π) (2.38) - this is given
+
+
+
+//2.Compute all αt(i),βt(i),γt(i,j),γt(i)values (2.39)
+//aPass alpha = new aPass(A,B,PI,O);
+
+//γt(i,j) = P(xt = qi,xt+1 = qj |O,λ).
+//γt(i) = αt(i)βt(i) / P(O|λ)
+
+//3. Re-estimate λ = (A, B, π) (2.40)
+//4. Repeat from 2. until convergence
    }
+
 }
