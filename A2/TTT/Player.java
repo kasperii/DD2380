@@ -1,157 +1,172 @@
 import java.util.*;
 
+
 public class Player {
-    /**
-     * Performs a move
-     *
-     * @param gameState
-     *            the current state of the board
-     * @param deadline
-     *            time before which we must have returned
-     * @return the next state the board is in after our move
-     */
-    public GameState play(final GameState gameState, final Deadline deadline) {
-
-        //System.err.println("X-players evaluation:"+evaluate(gameState,1));
-        //System.err.println("O-players evaluation:"+evaluate(gameState,2));
+		/**
+		 * Performs a move
+		 *
+		 * @param gameState
+		 *            the current state of the board
+		 * @param deadline
+		 *            time before which we must have returned
+		 * @return the next state the board is in after our move
+		 */
+		stateTable table;
 
 
-        Vector<GameState> nextStates = new Vector<GameState>();
-        gameState.findPossibleMoves(nextStates);
+		public GameState play(final GameState gameState, final Deadline deadline) {
+				
+				//System.err.println("X-players evaluation:"+evaluate(gameState,1));
+				//System.err.println("O-players evaluation:"+evaluate(gameState,2));
 
-        if (nextStates.size() == 0) {
-            // Must play "pass" move if there are no other moves possible.
-            return new GameState(gameState, new Move());
-        }
+				table=new stateTable(16*16*16*16);
 
-        /**
-         * Here you should write your algorithms to get the best next move, i.e.
-         * the best next state. This skeleton returns a random move instead.
-         */
+				Vector<GameState> nextStates = new Vector<GameState>();
+				gameState.findPossibleMoves(nextStates);
 
-        int bestValue=-2147483648;
-        int stateValue;
-        int bestStateIdx=0;
-        int alphaInit=-2147483648;
-        int betaInit=2147483647;
-
-        int searchDepth=5;
+				if (nextStates.size() == 0) {
+						// Must play "pass" move if there are no other moves possible.
+						return new GameState(gameState, new Move());
+				}
 
 
+				/**
+				 * Here you should write your algorithms to get the best next move, i.e.
+				 * the best next state. This skeleton returns a random move instead.
+				 */
 
-        for(int i=0;i<nextStates.size();i++){
+				int bestValue=-2147483648;
+				int stateValue;
+				int bestStateIdx=0;
+				int alphaInit=-2147483648;
+				int betaInit=2147483647;
 
-            stateValue=alphaBetaValue(nextStates.elementAt(i),searchDepth,alphaInit,betaInit,1);
-            if(stateValue>bestValue){
-                bestValue=stateValue;
-                bestStateIdx=i;
-
-                }
-                //System.err.println("||||||||best state is at "+i);
-            }
-
-       // Random random = new Random();
-       // return nextStates.elementAt(random.nextInt(nextStates.size()));
-
-        return nextStates.elementAt(bestStateIdx);
-    }
+				int searchDepth=3;
 
 
-    private int alphaBetaValue(GameState currentState,int depth,int alpha,int beta,int playerIdx){
+				for(int i=0;i<nextStates.size();i++){
 
-        //System.err.println("hey");
-        int v;
+						stateValue=alphaBetaValue(nextStates.elementAt(i),searchDepth,alphaInit,betaInit,1);
+						if(stateValue>bestValue){
+								bestValue=stateValue;
+								bestStateIdx=i;
+								}
+								//System.err.println("||||||||best state is at "+i);
+						}
 
-        if(depth==0 ){
-          v=evaluate(currentState,playerIdx);
-        }
+			 // Random random = new Random();
+			 // return nextStates.elementAt(random.nextInt(nextStates.size()));
 
-        else{
-          Vector<GameState> nextStates = new Vector<GameState>();
-          currentState.findPossibleMoves(nextStates);
-          if(nextStates.size() == 0){
-            v=evaluate(currentState,playerIdx);
-          }
-            else{
-
-                if(playerIdx==1){
-                    v=-2147483648; //smallest value in java?
-                    for(GameState s:nextStates){
-                        v=Math.max(v,alphaBetaValue(s,depth-1,alpha,beta,2));
-                        alpha=Math.max(alpha,v);
-                        if(beta<=alpha) break;
-                    }
-                }
-
-                else{ //player måste isf vara 2
-                    v=2147483647;
-                    for(GameState s:nextStates){
-                        v=Math.min(v,alphaBetaValue(s,depth-1,alpha,beta,1));
-                        beta=Math.min(beta,v);
-                        if(beta<=alpha) break;
-                    }
-
-                }
-            }
-        }
-
-        return v;
-
-        }
+				return nextStates.elementAt(bestStateIdx);
+		} 
 
 
-    private int evaluate(GameState state, int player){
+		private int alphaBetaValue(GameState currentState,int depth,int alpha,int beta,int playerIdx){
 
-    //sum of the number of marks in each row, column, diagonals that do not
-    //contain any of the opponents marks.
+				//System.err.println("hey");
+			int v;
 
-      int playerCellValue = 3-player;
-      int OtherPlayerCellValue = player;
-      //this is 1 for player with X and 2 for player with O
-      int[] differentSums = new int[10];
-      boolean[] nonNulledLine = new boolean[10];
-      //the first 4 are for the colunms, the following for the rows and the last for the diagonals
-      for (int c=0;c<4;c++){
-       for (int r=0;r<4;r++){
-         int valueOfCell = state.at(r,c);
+			if(table.contains(playerIdx,currentState)){
+				System.err.println("hämtar");
+				v=table.get(playerIdx,currentState);
+			}
 
-         //this one is 1 for X and 2 for O
-         if (valueOfCell == playerCellValue){
-           //this is if the value is the one that represents the players
-           differentSums[c] = (differentSums[c] + 1);
+			else{
+				if(depth==0 ){
+						v=evaluateSimple(currentState,playerIdx);      
+					}
 
-           differentSums[4+r] = (differentSums[4+r] + 1);
-           if(r==c){
-             //this is for one of the diagonals
-             differentSums[8] = (differentSums[8] + 1);
-           }
-           if(3-r==c){
-             //this is for the other of the diagonals
-             differentSums[9] = (differentSums[9] + 1);
-           }
-         }else if (valueOfCell == OtherPlayerCellValue){
-           //this is the cell has a value that is not empty and also not the players
-          nonNulledLine[c] = true;
-          nonNulledLine[4+r] = true;
-          if(r==c){
-            nonNulledLine[8] = true;
-          }
-          if(3-r==c){
-            nonNulledLine[9] = true;
-          }
-         }
-       }
-       }
-       int returnSum = 0;
-       for (int i = 0;i<10;i++){
-         if (!nonNulledLine[i]){
-           returnSum+=differentSums[i];
-         }
-       }
-       return returnSum;
-      }
+				else{
+					Vector<GameState> nextStates = new Vector<GameState>();
+					currentState.findPossibleMoves(nextStates);
+					if(nextStates.size() == 0){
+							v=evaluateSimple(currentState,playerIdx);
+					}						
+					else{
+						if(playerIdx==1){ 
+								v=-2147483648; //smallest value in java?
+									for(GameState s:nextStates){
+											v=Math.max(v,alphaBetaValue(s,depth-1,alpha,beta,2));
+											alpha=Math.max(alpha,v);
+											if(beta<=alpha) break;
+									} 
+						}
 
- //      col 0  1  2  3
+						else{ //player måste isf vara 2
+								v=2147483647;
+								for(GameState s:nextStates){
+									v=Math.min(v,alphaBetaValue(s,depth-1,alpha,beta,1));
+									beta=Math.min(beta,v);
+									if(beta<=alpha) break;
+								} 
+
+						}
+					}
+				}
+
+			  System.err.println("sparar");
+
+				table.put(playerIdx,currentState,v);
+
+			}
+
+			return v;
+				
+		}  
+
+
+		private int evaluate(GameState state, int player){
+
+		//sum of the number of marks in each row, column, diagonals that do not
+		//contain any of the opponents marks.
+
+			int playerCellValue = 3-player;
+			int OtherPlayerCellValue = player;
+			//this is 1 for player with X and 2 for player with O
+			int[] differentSums = new int[10];
+			boolean[] nonNulledLine = new boolean[10];
+			//the first 4 are for the colunms, the following for the rows and the last for the diagonals
+			for (int c=0;c<4;c++){
+			 for (int r=0;r<4;r++){
+				 int valueOfCell = state.at(r,c);
+
+				 //this one is 1 for X and 2 for O
+				 if (valueOfCell == playerCellValue){
+					 //this is if the value is the one that represents the players
+					 differentSums[c] = (differentSums[c] + 1);
+
+					 differentSums[4+r] = (differentSums[4+r] + 1);
+					 if(r==c){
+						 //this is for one of the diagonals
+						 differentSums[8] = (differentSums[8] + 1);
+					 }
+					 if(3-r==c){
+						 //this is for the other of the diagonals
+						 differentSums[9] = (differentSums[9] + 1);
+					 }
+				 }else if (valueOfCell == OtherPlayerCellValue){
+					 //this is the cell has a value that is not empty and also not the players
+					nonNulledLine[c] = true;
+					nonNulledLine[4+r] = true;
+					if(r==c){
+						nonNulledLine[8] = true;
+					}
+					if(3-r==c){
+						nonNulledLine[9] = true;
+					}
+				 }
+			 }
+			 }
+			 int returnSum = 0;
+			 for (int i = 0;i<10;i++){
+				 if (!nonNulledLine[i]){
+					 returnSum+=differentSums[i];
+				 }
+			 }
+			 return returnSum;
+			} 
+
+ //      col 0  1  2  3  
  // * row  ---------------
  // *  0  |  .  .  .  .  |  0
  // *  1  |  .  .  .  .  |  1
@@ -160,27 +175,27 @@ public class Player {
  // *      ---------------
  // *        0  1  2  3
 
-    private int evaluateSimple(GameState state, int playerIdx){
-        int value=0;
-        for(int r=0;r<4;r++){
-            for(int c=0;c<4;c++){
-                if(state.at(r,c)==playerIdx)value=value+2;
+		private int evaluateSimple(GameState state, int playerIdx){
+				int value=0;
+				for(int r=0;r<4;r++){
+						for(int c=0;c<4;c++){
+								if(state.at(r,c)==playerIdx)value=value+2;
 
-            }
-        }
+						}
+				}
 
-        if(state.at(0,0)==playerIdx)value++;
-        if(state.at(1,1)==playerIdx)value++;
-        if(state.at(2,2)==playerIdx)value++;
-        if(state.at(3,3)==playerIdx)value++;
+				if(state.at(0,0)==playerIdx)value++;
+				if(state.at(1,1)==playerIdx)value++;
+				if(state.at(2,2)==playerIdx)value++;
+				if(state.at(3,3)==playerIdx)value++;
 
-        if(state.at(3,0)==playerIdx)value++;
-        if(state.at(2,1)==playerIdx)value++;
-        if(state.at(1,2)==playerIdx)value++;
-        if(state.at(0,3)==playerIdx)value++;
+				if(state.at(3,0)==playerIdx)value++;
+				if(state.at(2,1)==playerIdx)value++;
+				if(state.at(1,2)==playerIdx)value++;
+				if(state.at(0,3)==playerIdx)value++;
 
-        return value;
+				return value;
 
 
-    }
+		}
 }

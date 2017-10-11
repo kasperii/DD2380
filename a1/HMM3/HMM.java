@@ -120,7 +120,7 @@ public class HMM {
 class GammaDelivery{
 	float[][] gamma;
 	float[][][] diGamma;
-	public AlphaDelivery(float[][] gin,float[][][] dgin){
+	public GammaDelivery(float[][] gin,float[][][] dgin){
 		gamma = gin;
 		diGamma = dgin;
 	}
